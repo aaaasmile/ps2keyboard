@@ -18,6 +18,12 @@ bool nextIsRelease = false;
 const int PinCLK = 2; // Generating interrupts using CLK signal
 const int PinDT = 3;  // Reading DT signal
 
+char ScancodeToASCII[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 94, 0, 0, 0, 0, 0, 0, 113, 49, 0, 0, 0, 121, 115, 97, 119, 50, 0,
+    0, 99, 120, 100, 101, 52, 51, 0, 0, 32, 118, 102, 116, 114, 53, 0, 0, 110, 98, 104, 103, 122, 54, 0, 0, 0, 109, 106, 117, 55, 56, 0,
+    0, 44, 107, 105, 111, 48, 57, 0, 0, 46, 45, 108, 148, 112, 0, 0, 0, 0, 132, 0, 129, 96, 0, 0, 0, 0, 10, 43, 0, 35, 0, 0,
+    0, 60, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 void setup()
 {
   pinMode(PinCLK, INPUT);
@@ -46,14 +52,16 @@ void loop()
     }
     else
     {
+      char ch = ScancodeToASCII[myKeyval & 127];
       if (nextIsRelease)
       {
-        Keyboard.release(myKeyval);
+        Keyboard.release(ch);
         nextIsRelease = false;
       }
       else
       {
-        Keyboard.press(myKeyval);
+
+        Keyboard.press(ch);
       }
     }
   }
@@ -61,6 +69,6 @@ void loop()
 
 void isr()
 {
-  keyval = keyval | (digitalRead(PinDT) << kbd_ptr); // legge un bit per volta (8 bit + start, stop e parity)
+  keyval = keyval | (digitalRead(PinDT) << kbd_ptr); // legge un bit per volta (start, 8 bitdata, stop e parity)
   kbd_ptr++;
 }
